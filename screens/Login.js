@@ -1,12 +1,31 @@
 import React, { useReducer } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, TextInput, Button, Alert } from 'react-native';
+import { firebase} from '../utils/firebaseConfig';
 
 const Login = ({navigation}) => {
   const [username, onChangeUsername] = React.useState('');
   const [password, onChangePassword] = React.useState('');
   const loginPress = () => {
-    navigation.navigate('Main'); 
+    if (username === '' || password === '') {
+      Alert.alert(
+        'Login Error', // Title
+        'Email and password cannot be empty.', // Message
+        [{ text: "OK" }]
+      );
+      return;
+    }
+    firebase
+    .auth()
+    .signInWithEmailAndPassword(username, password)
+      .then(() => {
+        navigation.navigate('Main'); 
+      })
+      .catch((error) => {
+        // Handle errors here, such as wrong password, no user with that email, etc.
+        Alert.alert('Login Error', error.message);
+      });
   };
+    
   const signupPress = () => {
     navigation.navigate('Signup');
   };
