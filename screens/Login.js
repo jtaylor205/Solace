@@ -43,6 +43,8 @@ const Login = ({navigation}) => {
             placeholderTextColor="#8a8a8a"
           />
           <TextInput
+            secureTextEntry
+            autoCapitalize='none'
             style={styles.input}
             onChangeText={onChangePassword}
             value={password}
