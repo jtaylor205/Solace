@@ -1,8 +1,5 @@
 import * as React from 'react';
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import TabBar from '../utils/Tabs';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
