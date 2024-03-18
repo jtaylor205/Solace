@@ -7,13 +7,12 @@ const Signup = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const register = () => {
-    // Make sure to validate email and password before attempting to register
-    // For example, check that email is not empty and password is of adequate length
     if (email === '' || password === '') {
-      alert('Email and password cannot be empty.');
+      Alert.alert('Email and password cannot be empty.');
+      [{ text: "OK" }]
       return;
     }
-
+  
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -22,27 +21,19 @@ const Signup = ({ navigation }) => {
         const data = {
           id: uid,
           email,
-          // fullName, // Commented out as fullName is not defined in this scope
         };
         const usersRef = firebase.firestore().collection('users');
-        usersRef
-          .doc(uid)
-          .set(data)
-          .catch((error) => {
-            alert(error.message);
-          });
+        Alert.alert(
+          'Success!',
+          'Solace account created',
+          [{ text: "OK", onPress: () => navigation.navigate('Main') }]
+        );
+        return usersRef.doc(uid).set(data); // Return the promise for chaining
       })
       .catch((error) => {
         alert(error.message);
+        return;
       });
-      
-      Alert.alert(
-        'Success!', // Title
-        'Solace account created', // Message
-        [
-          { text: "OK", onPress: () => navigation.navigate('Main') }
-        ]
-      );
   };
 
   return (
