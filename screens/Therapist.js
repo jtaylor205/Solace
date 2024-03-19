@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, Button, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import Ionicons from '@expo/vector-icons/Ionicons';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -12,6 +13,7 @@ class Message{
 }
 
 const Therapist = () => {
+  const { width, height } = useWindowDimensions();
   const [userText, setUserText] = useState('');
   const [messages, setMessages] = useState([]);
 
@@ -48,6 +50,17 @@ const Therapist = () => {
   };
 
   return (
+  
+    <>
+    <Canvas style={{ flex: 1 }}>
+        <Rect x={0} y={0} width={width} height={height}>
+          <LinearGradient
+            start={vec(0, 0)}
+            end={vec(width, height)}
+            colors={['#9D89C4', '#FFAC6B']}
+          />
+        </Rect>
+    </Canvas>
     <View style={styles.container}>
       <View style={styles.messagesContainer}>
       <ScrollView 
@@ -76,18 +89,19 @@ const Therapist = () => {
     </View>
     </View>
     </View>
+    </>
   );
   };
   
   const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 30,
-        backgroundColor: '#A4B0E4',
-        justifyContent: 'flex-end',
-        
+        justifyContent: 'space-between', 
+        paddingTop: 75,
+        paddingHorizontal: 25,
+        position: 'absolute', 
+        width: '100%', 
+        height: '100%', 
       },
       greeting: {
         color: 'white',
@@ -109,6 +123,7 @@ const Therapist = () => {
       },
       sendContainer:{
         flexDirection: 'row',
+        keyboardVerticalOffset: Platform.OS === "ios" ? 100 : 0,
       },buttonStyle: {
         alignSelf: 'center',
       }, buttonContainer: {
@@ -126,6 +141,12 @@ const Therapist = () => {
       }), messagesContainer: {
         width: '100%', 
         height: '85%',
+      },absoluteFill: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
       },
   });
   
