@@ -30,6 +30,8 @@ const Signup = ({ navigation }) => {
         const data = {
           id: uid,
           email,
+          firstName,
+          lastName
         };
         const usersRef = firebase.firestore().collection('users');
         Alert.alert(

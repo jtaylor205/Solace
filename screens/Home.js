@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInput } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icons
+import { firebase } from '../utils/firebaseConfig';
+
 
 const Home = () => {
   const { width, height } = useWindowDimensions();
@@ -9,6 +11,29 @@ const Home = () => {
   const [taskToDo, setTaskToDo] = useState(['Task 1']); // Initial task
   const [editIndex, setEditIndex] = useState(null); // Index of task being edited
   const [editedText, setEditedText] = useState(''); // Edited text for task
+  const [userDetails, setUserDetails] = useState({});
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        const uid = user.uid;
+        try {
+          const userDoc = await firebase.firestore().collection('users').doc(uid).get();
+          if (userDoc.exists) {
+            setUserDetails(userDoc.data());
+          } else {
+            console.log("No user data found!");
+          }
+        } catch (error) {
+          console.error("Error fetching user data: ", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
 
   const addTask = () => {
     const newTask = `Task ${taskToDo.length + 1}`;
@@ -51,7 +76,7 @@ const Home = () => {
         </Rect>
       </Canvas>
       <View style={styles.container}>
-        <Text style={styles.greeting}>Good Morning, Alex!</Text>
+        <Text style={styles.greeting}>Good Morning, {userDetails.firstName}!</Text>
         <View style={styles.checklist}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
