@@ -7,7 +7,7 @@ import Therapist from '../screens/Therapist';
 
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
+function Tabs() {
     return (
         <Tab.Navigator initialRouteName='Home'
             screenOptions={{
@@ -28,7 +28,7 @@ function MyTabs() {
                 component={Journal}
                 options={{
                     title: '',
-                    tabBarIcon: ({ color }) => ( // Define tabBarIcon function here
+                    tabBarIcon: ({ color }) => (
                         <Ionicons name="book-outline" size={30} color={color} />
                     ),
                 }}
@@ -58,4 +58,4 @@ function MyTabs() {
     );
 }
 
-export default MyTabs
+export default Tabs

@@ -1,10 +1,12 @@
 import React, { useReducer } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, Button, Alert } from 'react-native';
 import { firebase} from '../utils/firebaseConfig';
+import Signup from '../screens/Signup';
 
 const Login = ({navigation}) => {
   const [username, onChangeUsername] = React.useState('');
   const [password, onChangePassword] = React.useState('');
+  const [isSigningUp, changeSignUp] = React.useState(false);
   const loginPress = () => {
     if (username === '' || password === '') {
       Alert.alert(
@@ -25,40 +27,41 @@ const Login = ({navigation}) => {
         Alert.alert('Login Error', error.message);
       });
   };
-    
+  
   const signupPress = () => {
     navigation.navigate('Signup');
   };
+  
     return (
       <View style={styles.container}>
-        <View style={styles.imageContainer}>
-          <Image source={require('../assets/logo.png')} style={styles.image} resizeMode="contain" />
-        </View>
-          <Text style={styles.greeting}> Welcome to Solace </Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeUsername}
-            value={username}
-            placeholder="Username" // Placeholder text
-            placeholderTextColor="#8a8a8a"
-          />
-          <TextInput
-            secureTextEntry
-            autoCapitalize='none'
-            style={styles.input}
-            onChangeText={onChangePassword}
-            value={password}
-            placeholder="Password" // Placeholder text
-            placeholderTextColor="#8a8a8a"
-          />
-          <View style={styles.buttonContainer}>
-            <View style={styles.buttonStyle}>
-              <Button color = 'white' title="Sign Up" onPress={signupPress} />
-            </View>
-            <View style={styles.buttonStyle}>
-              <Button color = "white" title="Log In" onPress={loginPress} />
-            </View>
-          </View>
+                <View style={styles.imageContainer}>
+                  <Image source={require('../assets/logo.png')} style={styles.image} resizeMode="contain" />
+                </View>
+                  <Text style={styles.greeting}> Welcome to Solace </Text> 
+              <TextInput
+                style={styles.input}
+                onChangeText={onChangeUsername}
+                value={username}
+                placeholder="Username" // Placeholder text
+                placeholderTextColor="#8a8a8a"
+              />
+              <TextInput
+                secureTextEntry
+                autoCapitalize='none'
+                style={styles.input}
+                onChangeText={onChangePassword}
+                value={password}
+                placeholder="Password" // Placeholder text
+                placeholderTextColor="#8a8a8a"
+              /> 
+              <View style={styles.buttonContainer}>
+                <View style={styles.buttonStyle}>
+                  <Button color = 'white' title="Sign Up" onPress={signupPress} />
+                </View>
+                <View style={styles.buttonStyle}>
+                  <Button color = "white" title="Log In" onPress={loginPress} />
+                </View>
+              </View>
     </View>
     );
   };
@@ -71,7 +74,7 @@ const Login = ({navigation}) => {
         paddingHorizontal: 30,
         paddingBottom: 100,
         backgroundColor: '#A4B0E4',
-
+        
       },
       greeting: {
         color: 'white',
@@ -102,9 +105,9 @@ const Login = ({navigation}) => {
       },
       buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-evenly', // This will space your buttons evenly
-        width: '85%', // Ensure the container takes the full width of its parent
-        marginTop: 10, // Add some top margin if needed
+        justifyContent: 'space-evenly', 
+        width: '85%',
+        marginTop: 10, 
       }, 
       buttonStyle: {
         flex: 1,
