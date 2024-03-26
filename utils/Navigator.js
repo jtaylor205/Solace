@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import TabBar from '../utils/Tabs';
+import Tabs from '../utils/Tabs';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
 
@@ -23,9 +23,8 @@ function MyApp() {
           />
           <Stack.Screen 
             name="Main" 
-            component={TabBar} 
+            component={Tabs} 
             options={{ headerShown: false, animationEnabled: false }} 
-
           />
         </Stack.Navigator>
     );
