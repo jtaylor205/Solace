@@ -12,6 +12,24 @@ const Home = () => {
   const [editIndex, setEditIndex] = useState(null); // Index of task being edited
   const [editedText, setEditedText] = useState(''); // Edited text for task
   const [userDetails, setUserDetails] = useState({});
+  const [greeting, setGreeting] = useState('Good Morning');
+  const [gradientColors, setGradient] = useState(['#B4D8E8', '#FFB358'])
+
+  useEffect(() => {
+    const now = new Date();
+    const hours = now.getHours();
+  
+    if (hours < 12) {
+      setGreeting('Good Morning');
+      setGradient(['#2E97D1', '#FEC49F','#F56810']);
+    } else if (hours < 18) {
+      setGreeting('Good Afternoon');
+      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+    } else {
+      setGreeting('Good Evening');
+      setGradient(['#9D89C4', '#FFAC6B']);
+    }
+  }, []); 
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -70,13 +88,13 @@ const Home = () => {
         <Rect x={0} y={0} width={width} height={height}>
           <LinearGradient
             start={vec(0, 0)}
-            end={vec(width, height)}
-            colors={['#9D89C4', '#FFAC6B']}
+            end={vec(width, height)} //
+            colors={gradientColors}
           />
         </Rect>
       </Canvas>
       <View style={styles.container}>
-        <Text style={styles.greeting}>Good Morning, {userDetails.firstName}!</Text>
+        <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
         <View style={styles.checklist}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
@@ -170,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   writeTaskText: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#A4B0E4',
     fontWeight: 'bold',
   },

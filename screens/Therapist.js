@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -16,6 +16,20 @@ const Therapist = () => {
   const { width, height } = useWindowDimensions();
   const [userText, setUserText] = useState('');
   const [messages, setMessages] = useState([]);
+  const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
+
+  useEffect(() => {
+    const now = new Date();
+    const hours = now.getHours();
+  
+    if (hours < 12) {
+      setGradient(['#2E97D1', '#FEC49F','#F56810']);
+    } else if (hours < 18) {
+      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+    } else {
+      setGradient(['#9D89C4', '#FFAC6B']);
+    }
+  }, []); 
 
   const sendChat = async (mess) => {
     try{
@@ -57,7 +71,7 @@ const Therapist = () => {
           <LinearGradient
             start={vec(0, 0)}
             end={vec(width, height)}
-            colors={['#9D89C4', '#FFAC6B']}
+            colors={gradientColors}
           />
         </Rect>
     </Canvas>
