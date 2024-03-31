@@ -34,11 +34,6 @@ const Signup = ({ navigation }) => {
           lastName
         };
         const usersRef = firebase.firestore().collection('users');
-        Alert.alert(
-          'Success!',
-          'Solace account created',
-          [{ text: "OK", onPress: () => navigation.navigate('Main') }]
-        );
         return usersRef.doc(uid).set(data);
       })
       .catch((error) => {

@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia'
 
 
 const Journal = () => {
     const {width, height} = useWindowDimensions()
+    const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
+
+    useEffect(() => {
+      const now = new Date();
+      const hours = now.getHours();
+    
+      if (hours < 12) {
+        setGradient(['#2E97D1', '#FEC49F','#F56810']);
+      } else if (hours < 18) {
+        setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+      } else {
+        setGradient(['#9D89C4', '#FFAC6B']);
+      }
+    }, []); 
 
     return (
       <>
@@ -13,7 +27,7 @@ const Journal = () => {
           <LinearGradient 
             start={vec(0,0)}
             end={vec(width, height)}
-            colors={['#9D89C4', '#FFAC6B']}
+            colors={gradientColors}
             />
         </Rect>
       </Canvas>
