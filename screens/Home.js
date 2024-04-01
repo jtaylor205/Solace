@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInpu
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icons
 import { firebase } from '../utils/firebaseConfig';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-const Home = () => {
+const Home = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
 
   const [taskToDo, setTaskToDo] = useState(['Task 1']); // Initial task
@@ -94,7 +95,17 @@ const Home = () => {
         </Rect>
       </Canvas>
       <View style={styles.container}>
-        <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
+        <View style={styles.topContainer}>
+          <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <Ionicons 
+              size = "25"
+              marginBottom = "10"
+              color = "white"
+              name="person-circle-outline"></Ionicons>
+        </TouchableOpacity>
+        </View>
+       
         <View style={styles.checklist}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
@@ -165,6 +176,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     borderColor: 'white',
+  },
+  topContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   taskText: {
     color: 'white',
