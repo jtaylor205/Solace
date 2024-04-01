@@ -1,12 +1,11 @@
 import React, { useReducer } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, Button, Alert } from 'react-native';
 import { firebase} from '../utils/firebaseConfig';
-import Signup from '../screens/Signup';
+
 
 const Login = ({navigation}) => {
   const [username, onChangeUsername] = React.useState('');
   const [password, onChangePassword] = React.useState('');
-  const [isSigningUp, changeSignUp] = React.useState(false);
   const loginPress = () => {
     if (username === '' || password === '') {
       Alert.alert(
