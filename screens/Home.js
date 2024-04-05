@@ -4,7 +4,7 @@ import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icons
 import { firebase } from '../utils/firebaseConfig';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const Home = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
@@ -14,7 +14,8 @@ const Home = ({ navigation }) => {
   const [editedText, setEditedText] = useState(''); // Edited text for task
   const [userDetails, setUserDetails] = useState({});
   const [greeting, setGreeting] = useState('Good Morning');
-  const [gradientColors, setGradient] = useState(['#B4D8E8', '#FFB358'])
+  const [gradientColors, setGradient] = useState(['#B4D8E8', '#FFB358']);
+  const [motivationText, setMotivationText] = useState('');
 
   useEffect(() => {
     const now = new Date();
@@ -53,6 +54,17 @@ const Home = ({ navigation }) => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    const generateMotivationText = async () => {
+      const genAI = new GoogleGenerativeAI("AIzaSyB6WI7g4ENpYQVIs7c1EBFdW0XbemwYo8s");
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const result = await model.generateContent("Give me a two sentence motivational fun fact. Make sure its purpose is to motivate");
+      const response = await result.response;
+      const text = await response.text();
+      setMotivationText(text);
+    };
+    generateMotivationText();
+  }, []);
 
   const addTask = () => {
     const newTask = `Task ${taskToDo.length + 1}`;
@@ -97,16 +109,21 @@ const Home = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Ionicons 
-              size = "25"
-              marginBottom = "10"
-              color = "white"
-              name="person-circle-outline"></Ionicons>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+            <Ionicons 
+                size = "25"
+                marginBottom = "10"
+                color = "white"
+                name="person-circle-outline"></Ionicons>
+          </TouchableOpacity>
         </View>
-       
-        <View style={styles.checklist}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Daily Motivation</Text>
+          <View style={styles.content}>
+            <Text style={styles.motivationText}>{motivationText}</Text>
+          </View>
+        </View>
+        <View style={styles.section}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
             {taskToDo.map((task, index) => (
@@ -156,6 +173,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  content: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+  },
   subheading: {
     color: 'white',
     fontSize: 16,
@@ -196,7 +227,7 @@ const styles = StyleSheet.create({
     flex: 1, // Take up remaining space
   },
   addTaskWrapper: {
-    marginTop: 8,
+    marginTop: -20,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -207,6 +238,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#A4B0E4',
     fontWeight: 'bold',
+  },
+  motivationText: {
+    fontSize: 13,
+    color: 'black', // Change color as needed
   },
 });
 
