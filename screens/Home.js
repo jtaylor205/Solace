@@ -194,7 +194,6 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   checklistWrapper: {
-    padding: 10,
     backgroundColor: 'transparent',
   },
   taskContainer: {
@@ -202,7 +201,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginBottom: 10,
     borderWidth: 2,
     borderRadius: 10,
