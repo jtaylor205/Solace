@@ -26,7 +26,7 @@ const Home = ({ navigation }) => {
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
     } else if (hours < 18) {
       setGreeting('Good Afternoon');
-      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+      setGradient(['#66CCFF', '#FFCC99']);
     } else {
       setGreeting('Good Evening');
       setGradient(['#9D89C4', '#FFAC6B']);
