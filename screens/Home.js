@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInput } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
+import { useRoute, useFocusEffect } from "@react-navigation/native"
 import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icons
 import { firebase } from '../utils/firebaseConfig';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -33,7 +34,7 @@ const Home = ({ navigation }) => {
     }
   }, []); 
 
-  useEffect(() => {
+
     const fetchUserData = async () => {
       const user = firebase.auth().currentUser;
       if (user) {
@@ -51,8 +52,15 @@ const Home = ({ navigation }) => {
       }
     };
 
-    fetchUserData();
-  }, []);
+    useFocusEffect(
+      React.useCallback(() => {
+          fetchUserData();
+
+          return () => {
+              // Optional cleanup actions
+          };
+      }, [])
+  );
 
   useEffect(() => {
     const generateMotivationText = async () => {
@@ -109,7 +117,7 @@ const Home = ({ navigation }) => {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", {first: userDetails.firstName,last: userDetails.lastName, email: userDetails.email})}>
             <Ionicons 
                 size = "25"
                 marginBottom = "10"

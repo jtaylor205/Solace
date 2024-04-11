@@ -1,15 +1,68 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
-const Therapist = ({ navigation }) => {
+import { firebase } from '../utils/firebaseConfig';
+import { useRoute } from "@react-navigation/native"
+const Profile = ({ navigation }) => {
+  const route = useRoute()
+  const firstName= route.params?.first
+  const lastName= route.params?.last
+  const email= route.params?.email
   const { width, height } = useWindowDimensions();
-  const [userFirstName, setUserFirstName] = useState('');
-  const [isEditingName, setIsEditingName] = useState(false);
-
-
-  return (
+  const [userName, setUserName] = useState(`${firstName} ${lastName}`);
+  const [userEmail, setEmail] = useState(email);
   
+  const updateProfile = async () => {
+    const user = firebase.auth().currentUser;
+  
+    if (user) {
+      // Split the full name into first and last names
+      const splitName = userName.trim().split(' ');
+      const firstName = splitName[0];
+      const lastName = splitName.length > 1 ? splitName[1] : ''; // Assuming there's at least a last name
+  
+      // Update the user's email
+      user.updateEmail(userEmail)
+        .then(() => {
+          console.log('Email updated successfully!');
+        })
+        .catch(error => {
+          console.error('Error updating email:', error);
+        });
+  
+      // Update user's profile in Firebase Authentication
+      user.updateProfile({
+        displayName: `${firstName} ${lastName}`
+      })
+        .then(() => {
+          console.log('Profile updated successfully!');
+          // Optionally update Firestore here if needed
+          updateFirestoreUser(user.uid, firstName, lastName, userEmail);
+        })
+        .catch(error => {
+          console.error('Error updating profile:', error);
+        });
+    }
+    navigation.navigate('Main');
+  };
+  
+  // Function to update Firestore
+  const updateFirestoreUser = (uid, firstName, lastName, email) => {
+    const usersRef = firebase.firestore().collection('users').doc(uid);
+    usersRef.update({
+      firstName: firstName,
+      lastName: lastName,
+      email: email // Only if you are storing email in Firestore and it's being updated
+    })
+    .then(() => {
+      console.log('Firestore details updated!');
+    })
+    .catch(error => {
+      console.error('Error updating Firestore:', error);
+    });
+  };
+  
+  return (
     <KeyboardAvoidingView
     style={{ flex: 1 }}
     behavior={Platform.OS === "ios" ? "padding" : "height"}>
@@ -23,35 +76,31 @@ const Therapist = ({ navigation }) => {
               name="chevron-back-outline"></Ionicons>
         </TouchableOpacity>
      </View>
-    <View style={styles.headerContainer}>
-    <Text>Name: </Text>
-    <TouchableOpacity onPress={() => setIsEditingName(!isEditingName)}>
-    <Text
-    style={styles.greeting}
-    > {isEditingName ? 'Done' : 'Edit'} </Text>
-    </TouchableOpacity>
+    <View>
+      <View style={styles.circle}>
+              <Text style={styles.letters}>{firstName[0]}{lastName[0]}</Text>
+      </View>
+    <Text style={styles.headerContainer}> Name: </Text>
+    <TextInput
+      autoCapitalize='none'
+      style={styles.input}
+      onChangeText={setUserName}
+      value={userName}
+    /> 
+    <Text style={styles.headerContainer}> Email: </Text>
+    <TextInput
+      autoCapitalize='none'
+      style={styles.input}
+      onChangeText={setEmail}
+      value={userEmail}
+    /> 
+    <View style={styles.buttonContainer}>
+                <View style={styles.buttonStyle}>
+                  <Button color = "white" title="Update"  onPress={updateProfile}/>
+                </View>
+              </View>
     </View>
-    {isEditingName? (
-        <TextInput style={styles.textField}
-        onChangeText={setUserFirstName}        >
-        </TextInput>
-        
-    ): (
-        <Text>Hello</Text>
-    )
-
-    }
-
-
-
-    <View style={styles.headerContainer}>
-    <Text>Profile</Text>
-    <TouchableOpacity>
-    <Text
-    color = "blue"
-    >Edit</Text>
-    </TouchableOpacity>
-    </View>
+    
     </View>
     </KeyboardAvoidingView>
   );
@@ -60,16 +109,11 @@ const Therapist = ({ navigation }) => {
   const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-between', 
         paddingTop: 50,
         paddingHorizontal: 25,
         position: 'absolute', 
         width: '100%', 
         height: '100%', 
-      },
-      greeting: {
-        color: 'blue',
-        
       },
       input: {
         height: 40,
@@ -79,25 +123,28 @@ const Therapist = ({ navigation }) => {
         paddingHorizontal: 10,
         borderRadius: 10,
         backgroundColor: '#D9D9D9'
-      }, scrollView: {
-        height: '60%',
-      },
-      sendContainer:{
+      },buttonContainer: {
         flexDirection: 'row',
-        keyboardVerticalOffset: Platform.OS === "ios" ? 100 : 0,
-      },buttonStyle: {
-        alignSelf: 'center',
-      }, buttonContainer: {
-        flexDirection: 'row',
-        width: '85%', 
-        marginTop: 10, 
+        justifyContent: 'space-evenly', 
+        width: '85%',
+        margin: 12,
+        
+        
+        borderRadius: 10,
+      }, 
+      buttonStyle: {
+        flex: 1,
+        marginHorizontal: 5,
+        backgroundColor: '#6175A9',
+        borderRadius: 10,
+        textAlign: 'center',
       },topContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
       },headerContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
       },textField: {
         height: 40,
@@ -107,7 +154,21 @@ const Therapist = ({ navigation }) => {
         padding: 10,
         borderRadius: 10,
         backgroundColor: '#D9D9D9'
-      },
+      },circle: {
+        alignSelf: 'center',
+        width: 100,         
+        height: 100,         
+        borderRadius: 50,    
+        backgroundColor: 'gray', 
+        justifyContent: 'center',  
+        alignItems: 'center'        
+    },
+    letters: {
+        alignSelf: 'center',
+        color: 'white',     // Color of the text
+        fontSize: 24,       // Size of the text
+        fontWeight: 'bold'  // Bold text
+    }
   });
   
-  export default Therapist;
+  export default Profile;

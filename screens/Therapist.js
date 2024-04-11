@@ -34,7 +34,7 @@ const Therapist = () => {
     if (hours < 12) {
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
     } else if (hours < 18) {
-      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+      setGradient(['#66CCFF', '#FFCC99']);
     } else {
       setGradient(['#9D89C4', '#FFAC6B']);
     }
@@ -55,7 +55,7 @@ const Therapist = () => {
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       setUserText("");
       setMessages((currentMessages) => [...currentMessages, new Message("User", mess), new Message("AI", " . . . ")]);
-      const result = await model.generateContent("Act as a mental health specialist and provide mindfullness advice tailored for busy college students, focusing on reducing stress and enhancing focus. Respond consicely and act like the conversation is ongoing and you are not just being filled in. Here is the current conversation you are having with the user:" + chatHistory + "\n and here is the next piece of the conversation asked by the user: " + mess + " Please continue the conversation as normal. Answer every question as if you are a normal person. The usage of AI: and User: are to keep you updated on who said what. Do not include 'AI: ' or 'User: ' in any response whatsoever. Your messages are the ones after AI: , and the user's messages are the ones after User: ");
+      const result = await model.generateContent("Act as a mental health specialist and provide mindfullness advice tailored for busy college students, focusing on reducing stress and enhancing focus. Respond consicely and act like the conversation is ongoing and you are not just being filled in. Here is the current conversation you are having with the user:" + chatHistory + "\n and here is the next piece of the conversation asked by the user: " + mess + " Please continue the conversation as normal. Answer every question as if you are a normal person. The usage of AI: and User: are to keep you updated on who said what. Do not include 'AI: ' or 'User: ' in any response whatsoever. Your messages are the ones after AI: , and the user's messages are the ones after User: . Make your responses no longer than 100 words");
       const response = await result.response;
       const text = await response.text(); 
       if (text) {
