@@ -14,7 +14,7 @@ const Journal = () => {
       if (hours < 12) {
         setGradient(['#2E97D1', '#FEC49F','#F56810']);
       } else if (hours < 18) {
-        setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+        setGradient(['#66CCFF', '#FFCC99']);
       } else {
         setGradient(['#9D89C4', '#FFAC6B']);
       }
