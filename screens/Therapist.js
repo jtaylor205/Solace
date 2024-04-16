@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard} from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import Ionicons from '@expo/vector-icons/Ionicons';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -17,6 +17,15 @@ const Therapist = () => {
   const [userText, setUserText] = useState('');
   const [messages, setMessages] = useState([]);
   const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
+  
+  const _keyboardDidShow = () => {
+    this.scrollView.scrollToEnd({ animated: true });
+  };
+
+  const keyboardDidShowListener = Keyboard.addListener(
+    'keyboardDidShow',
+    _keyboardDidShow,
+  );
 
   useEffect(() => {
     const now = new Date();
@@ -25,20 +34,28 @@ const Therapist = () => {
     if (hours < 12) {
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
     } else if (hours < 18) {
-      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
+      setGradient(['#66CCFF', '#FFCC99']);
     } else {
       setGradient(['#9D89C4', '#FFAC6B']);
     }
+
+    const welcomeMessage = new Message("AI", "Hi! I am the Solace Wellness Companion. How can I assist you today?");
+    setMessages([welcomeMessage]);
   }, []); 
 
   const sendChat = async (mess) => {
     try{
+
+      const chatHistory = messages.filter(msg => msg.sender !== 'Placeholder').map(msg => `${msg.sender}: ${msg.message}`).join("\n");
+
+    // Step 2: Concatenate the new message with the chat history
+      const fullMessage = chatHistory + "\nUser: " + mess;
       // Connects to API and asks question 
       const genAI = new GoogleGenerativeAI("AIzaSyB6WI7g4ENpYQVIs7c1EBFdW0XbemwYo8s");
       const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       setUserText("");
       setMessages((currentMessages) => [...currentMessages, new Message("User", mess), new Message("AI", " . . . ")]);
-      const result = await model.generateContent(" Answer in 80 words:" + mess);
+      const result = await model.generateContent("Act as a mental health specialist and provide mindfullness advice tailored for busy college students, focusing on reducing stress and enhancing focus. Respond consicely and act like the conversation is ongoing and you are not just being filled in. Here is the current conversation you are having with the user:" + chatHistory + "\n and here is the next piece of the conversation asked by the user: " + mess + " Please continue the conversation as normal. Answer every question as if you are a normal person. The usage of AI: and User: are to keep you updated on who said what. Do not include 'AI: ' or 'User: ' in any response whatsoever. Your messages are the ones after AI: , and the user's messages are the ones after User: . Make your responses no longer than 100 words");
       const response = await result.response;
       const text = await response.text(); 
       if (text) {
@@ -65,7 +82,11 @@ const Therapist = () => {
 
   return (
   
-    <>
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+  
+  >
     <Canvas style={{ flex: 1 }}>
         <Rect x={0} y={0} width={width} height={height}>
           <LinearGradient
@@ -78,10 +99,12 @@ const Therapist = () => {
     <View style={styles.container}>
       <View style={styles.messagesContainer}>
       <ScrollView 
+      style={{flex: 1}}
+      contentContainerStyle={{flexGrow: 1, flexDirection: 'column-reverse'}}
       // Scrolls view down to most recent messages
       ref={(ref) => { this.scrollView = ref; }}
       onContentSizeChange={() => this.scrollView.scrollToEnd({animated: true})}>
-      {messages.map((msg, index) => (
+      {messages.slice().reverse().map((msg, index) => (
           <Text key={index} style={styles.message(msg.sender)}>
             {msg.message}
           </Text>
@@ -103,7 +126,7 @@ const Therapist = () => {
     </View>
     </View>
     </View>
-    </>
+    </KeyboardAvoidingView>
   );
   };
   
@@ -111,7 +134,7 @@ const Therapist = () => {
     container: {
         flex: 1,
         justifyContent: 'space-between', 
-        paddingTop: 75,
+        paddingTop: 50,
         paddingHorizontal: 25,
         position: 'absolute', 
         width: '100%', 
@@ -129,7 +152,7 @@ const Therapist = () => {
         width: '85%',
         margin: 12,
         borderWidth: 1,
-        padding: 10,
+        paddingHorizontal: 10,
         borderRadius: 10,
         backgroundColor: '#D9D9D9'
       }, scrollView: {
@@ -154,7 +177,7 @@ const Therapist = () => {
         overflow: 'hidden',
       }), messagesContainer: {
         width: '100%', 
-        height: '85%',
+        height: '92%',
       },absoluteFill: {
         position: 'absolute',
         top: 0,
