@@ -1,24 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInput, SectionList } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
-import { AntDesign } from '@expo/vector-icons'; // Import AntDesign icons
 import { firebase } from '../utils/firebaseConfig';
-
+import uuid from 'react-native-uuid'
+import Task from '../components/Task';
+import TaskModal from '../components/TaskModal';
+import { loadFromStorage, saveToStorage } from "../utils/storage";
 
 const Home = () => {
+  //For Gradient size
   const { width, height } = useWindowDimensions();
-
-  const [taskToDo, setTaskToDo] = useState(['Task 1']); // Initial task
-  const [editIndex, setEditIndex] = useState(null); // Index of task being edited
-  const [editedText, setEditedText] = useState(''); // Edited text for task
-  const [userDetails, setUserDetails] = useState({});
+  //For greeting specific user
+  const [userDetails, setUserDetails] = useState([]);
+  //For greeting time specification
   const [greeting, setGreeting] = useState('Good Morning');
+  //For gradient time specification
   const [gradientColors, setGradient] = useState(['#B4D8E8', '#FFB358'])
 
+  //TASKS
+  const [tasks, setTasks] = useState(null);
+  // Ref to the modal component -> allows us to present/dismiss the modal from the parent component
+  const bottomSheetModalRef = useRef(null);
+  // Object that separates the todos into two sections: active and completed (passed to the SectionList component)
+  const sections = [
+    { title: "Active", data: tasks?.filter((task) => !task.completed) },
+    { title: "Completed", data: tasks?.filter((task) => task.completed) },
+  ].filter((section) => section.data?.length > 0);
+
+  // Hook to load the todos from the device's storage when the screen is mounted
+  useEffect(() => {
+    loadFromStorage("tasks").then((loadedTasks) => {
+      setTasks(loadedTasks);
+    });
+  }, []);
+
+  // Hook to save the todos to the device's storage whenever the todos changes (completed, create, delete)
+  useEffect(() => {
+    if (tasks) {
+      saveToStorage(tasks, "tasks");
+    }
+  }, [tasks]);
+
+  // Callback function to handle the creation of a new todo (called from the TaskModal component)
+  const handleAddTask = (input) => {
+    const newTask = {
+      id: uuid.v4(),
+      text: input,
+      completed: false,
+    };
+
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
+
+  const handleCheck = (id) => {
+    setTasks((prevTasks) => {
+      return prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      );
+    });
+  };
+
+  // Callback function to handle the deletion of a todo (called from the TodoItem component)
+  const handleDeletion = (id) => {
+    setTasks((prevTasks) => {
+      return prevTasks?.filter((task) => task.id !== id);
+    });
+  };
+
+  // Function to render an empty list message (if no todos)
+  const emptyList = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyContainerText}>Press "Write a Task +" to get started</Text>
+    </View>
+  );
+
+
+  //Changes gradient/greeting based on time
   useEffect(() => {
     const now = new Date();
     const hours = now.getHours();
-  
     if (hours < 12) {
       setGreeting('Good Morning');
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
@@ -31,6 +91,7 @@ const Home = () => {
     }
   }, []); 
 
+  //Fetches user name from firebase for greeting use
   useEffect(() => {
     const fetchUserData = async () => {
       const user = firebase.auth().currentUser;
@@ -53,35 +114,6 @@ const Home = () => {
   }, []);
 
 
-  const addTask = () => {
-    const newTask = `Task ${taskToDo.length + 1}`;
-    setTaskToDo([...taskToDo, newTask]); // Add new task to the task list
-  };
-
-  const handleEdit = (index) => {
-    setEditIndex(index); // Set the index of the task being edited
-    setEditedText(taskToDo[index]); // Set the initial text of the edited task
-  };
-
-  const handleSave = () => {
-    if (editedText.trim() === '') {
-      // Remove the task if the edited text is empty
-      setTaskToDo(taskToDo.filter((_, index) => index !== editIndex));
-    } else {
-      // Update the task text if it's not empty
-      const updatedTasks = [...taskToDo];
-      updatedTasks[editIndex] = editedText;
-      setTaskToDo(updatedTasks);
-    }
-    // Clear editing state
-    setEditIndex(null);
-    setEditedText('');
-  };
-
-  const handleDelete = (index) => {
-    setTaskToDo(taskToDo.filter((_, i) => i !== index)); // Remove the task from the list
-  };
-
   return (
     <>
       <Canvas style={{ flex: 1 }}>
@@ -98,36 +130,48 @@ const Home = () => {
         <View style={styles.checklist}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
-            {taskToDo.map((task, index) => (
-              <TouchableOpacity key={index} onPress={() => handleEdit(index)}>
-                <View style={styles.taskContainer}>
-                  {editIndex === index ? ( // Conditionally render TextInput for editing
-                    <TextInput
-                      style={styles.input}
-                      value={editedText}
-                      onChangeText={setEditedText}
-                      autoFocus
-                      onBlur={handleSave}
-                    />
-                  ) : (
-                    <>
-                      <Text style={styles.taskText}>{task}</Text>
-                      <TouchableOpacity onPress={() => handleDelete(index)} style={styles.deleteIcon}>
-                        <AntDesign name="close" size={20} color="white" />
-                      </TouchableOpacity>
-                    </>
+            <SectionList
+              sections={sections}
+              keyExtractor={(item) => item.id}
+              // What to render for each todo
+              renderItem={({ item, index, section }) => (
+                <>
+                  <Task 
+                    item={item}
+                    onCheck={handleCheck}
+                    onDeletion={handleDeletion}
+                  />
+                  {section.title === "Active" && index === section.data.length - 1 && sections.find(sec => sec.title === "Completed") && (
+                    <View style={styles.separator} />
                   )}
-                </View>
-              </TouchableOpacity>
-            ))}
+                </>
+              )}
+              // Rendering the title of the sections
+              renderSectionHeader={({ section: { title } }) => (
+                <Text style={styles.sectionHeader}>{title}</Text>
+              )}
+              contentContainerStyle={styles.listContentContainer}
+              renderSectionFooter={() => <View style={styles.sectionFooter} />}
+              ListEmptyComponent={emptyList}
+              stickySectionHeadersEnabled={false}
+            />
           </View>
         </View>
-        <TouchableOpacity onPress={addTask}>
-          <View style={styles.addTaskWrapper}>
-            <Text style={styles.writeTaskText}>Write a Task +</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={styles.addTaskContainer}>
+          <TouchableOpacity
+            onPress={() => bottomSheetModalRef.current?.present()}
+            style={styles.addTaskTouchable}
+          >
+            <View style={styles.addTaskWrapper}>
+              <Text style={styles.writeTaskText}>Write a Task +</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
+    <TaskModal 
+        handleAddTask={handleAddTask}
+        bottomSheetModalRef={bottomSheetModalRef}
+      />
     </>
   );
 };
@@ -145,6 +189,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  checklist: {
+
+  },
   subheading: {
     color: 'white',
     fontSize: 16,
@@ -154,33 +201,32 @@ const styles = StyleSheet.create({
   checklistWrapper: {
     padding: 10,
     backgroundColor: 'transparent',
-  },
-  taskContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    borderWidth: 2,
-    borderRadius: 10,
     borderColor: 'white',
+    borderWidth: '3px',
+    borderRadius: 10,
   },
-  taskText: {
+  sectionHeader: {
     color: 'white',
-    fontSize: 16,
-    flex: 1, // Take up remaining space
+    fontSize: 14,
+    fontWeight: '600',
   },
-  deleteIcon: {
-    marginLeft: 10,
+  sectionFooter: {
+
   },
-  input: {
-    color: 'white',
-    fontSize: 16,
-    flex: 1, // Take up remaining space
+  addTaskContainer: {
+    marginVertical: 20,
+    marginHorizontal: 1,
+  },
+  addTaskButtonContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 0,
+  },
+  addTaskTouchable: {
+    padding:0,
   },
   addTaskWrapper: {
-    marginTop: 8,
+    // marginTop: 8,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -191,6 +237,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#A4B0E4',
     fontWeight: 'bold',
+  },
+  emptyContainerText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  separator: {
+    height: 2,
+    backgroundColor: 'white',
+    marginVertical: 10,
   },
 });
 
