@@ -11,13 +11,29 @@ const Journal = () => {
     const [prompt, setPrompt] = useState('');
 
     const {width, height} = useWindowDimensions()
+    const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
     const currentDate = new Date().toLocaleDateString();
     const date = new Date();
     let day = date.getDate();
     let month = date.getMonth();
     let year = date.getFullYear();
 
-// node --version # Should be >= 18
+    useEffect(() => {
+      const now = new Date();
+      const hours = now.getHours();
+    
+      if (hours < 12) {
+        setGradient(['#2E97D1', '#FEC49F','#F56810']);
+      } else if (hours < 18) {
+        setGradient(['#66CCFF', '#FFCC99']);
+      } else {
+        setGradient(['#9D89C4', '#FFAC6B']);
+      }
+    }, []); 
+
+
+
+// node --version # Should be >= 18npm 
 // npm install @google/generative-ai
 
 const {
@@ -64,7 +80,7 @@ console.log("---------------------------------");
           <LinearGradient 
             start={vec(0,0)}
             end={vec(width, height)}
-            colors={['#9D89C4', '#FFAC6B']}
+            colors={gradientColors}
             
             />
         </Rect>
