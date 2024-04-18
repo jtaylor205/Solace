@@ -5,6 +5,7 @@ import { firebase } from '../utils/firebaseConfig';
 import Tabs from '../utils/Tabs';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
+import Profile from '../screens/Profile'
 
 const Stack = createStackNavigator();
 
@@ -37,7 +38,11 @@ function MyApp() {
             component={Tabs} 
             options={{ headerShown: false, animationEnabled: false }} 
           />
-          
+          <Stack.Screen 
+            name="Profile" 
+            component={Profile} 
+            options={{ headerShown: false, animationEnabled: true }} 
+          />
           </>
         ) : (
           // No user is signed in
