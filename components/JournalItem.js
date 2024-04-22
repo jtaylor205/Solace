@@ -11,6 +11,9 @@ export default JournalItem = ({ item, navigation }) => {
     minute: "2-digit",
     hour12: true,
   });
+  // Check if the title or content is empty and display "Empty [Title/Text]" accordingly
+  const title = item.title.trim() !== "" ? item.title : "(Empty Title)";
+  const content = item.content.trim() !== "" ? item.content : "(Empty Text)";
 
   return (
     <TouchableOpacity
@@ -20,10 +23,10 @@ export default JournalItem = ({ item, navigation }) => {
     >
       {/* Display the title, content, and date of the entry */}
       <Text style={styles.JournalTitle} numberOfLines={1} ellipsizeMode="tail">
-        {item.title}
+        {title}
       </Text>
       <Text style={styles.journalContent} numberOfLines={1} ellipsizeMode="tail">
-        {item.content}
+        {content}
       </Text>
       <Text style={styles.journalDate}>{formattedDate}</Text>
     </TouchableOpacity>
@@ -32,7 +35,7 @@ export default JournalItem = ({ item, navigation }) => {
 
 const styles = StyleSheet.create({
   entryItem: {
-    height: 150,
+    height: 115,
     alignItems: "left",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: "#c7c7c7",

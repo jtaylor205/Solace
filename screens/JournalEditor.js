@@ -33,11 +33,21 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
   
     const handleSave = () => {
         // If the user did not enter a title or content, do not save the note
-        if (title == '' && content == '') {
+        if (title == "" && content == "") {
             navigation.navigate("Journal");
             return;
         }
-
+        if (existingEntry) {
+            const newEntry = {
+                ...existingEntry,
+                title,
+                content,
+                lastModified: Date.now(),
+            };
+            navigation.navigate("Journal", { newEntry });
+            return;
+        }
+        
         // If the user did not enter a title or content, do not save the note
         const newEntry = {
             id: entry?.id || uuid.v4(),
