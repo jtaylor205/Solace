@@ -18,7 +18,7 @@ const Home = () => {
   const [gradientColors, setGradient] = useState(['#B4D8E8', '#FFB358'])
 
   //TASKS
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(null);
   // Ref to the modal component -> allows us to present/dismiss the modal from the parent component
   const bottomSheetModalRef = useRef(null);
   // Object that separates the todos into two sections: active and completed (passed to the SectionList component)

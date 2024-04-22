@@ -1,11 +1,38 @@
 import * as React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Home from '../screens/Home';
 import Journal from '../screens/Journal';
 import Therapist from '../screens/Therapist';
+import JournalEditor from '../screens/JournalEditor';
 
 const Tab = createBottomTabNavigator();
+
+const JournalStack = createStackNavigator();
+
+// Stack navigation for the Notes and NoteEditor screens
+const JournalStackScreen = () => {
+    return (
+      <JournalStack.Navigator
+        initialRouteName="Journal"
+        screenOptions={{ headerStyle: { height: 100 } }}
+      >
+        <JournalStack.Screen 
+            name="Journal" 
+            component={Journal}
+            options={{ headerShown: false }}
+        />
+        <JournalStack.Screen
+          name="JournalEditor"
+          component={JournalEditor}
+          // Hide the header for the NoteEditor screen (implements a custom header in NoteEditor.js)
+          options={{ headerShown: false }}
+        />
+      </JournalStack.Navigator>
+    );
+  };
+  
 
 function Tabs() {
     return (
@@ -24,8 +51,8 @@ function Tabs() {
             }}
         >
             <Tab.Screen
-                name="Journal"
-                component={Journal}
+                name="JournalStack"
+                component={JournalStackScreen}
                 options={{
                     title: '',
                     tabBarIcon: ({ color }) => (
