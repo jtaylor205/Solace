@@ -18,7 +18,11 @@ const JournalStackScreen = () => {
         initialRouteName="Journal"
         screenOptions={{ headerStyle: { height: 100 } }}
       >
-        <JournalStack.Screen name="Journal" component={Journal} />
+        <JournalStack.Screen 
+            name="Journal" 
+            component={Journal}
+            options={{ headerShown: false }}
+        />
         <JournalStack.Screen
           name="JournalEditor"
           component={JournalEditor}

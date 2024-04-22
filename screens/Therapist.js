@@ -34,7 +34,7 @@ const Therapist = () => {
     if (hours < 12) {
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
     } else if (hours < 18) {
-      setGradient(['#66CCFF', '#FFCC99']);
+      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
     } else {
       setGradient(['#9D89C4', '#FFAC6B']);
     }
@@ -151,10 +151,11 @@ const Therapist = () => {
         height: 40,
         width: '85%',
         margin: 12,
-        borderWidth: 1,
+        borderWidth: 2,
+        borderColor: "#8a8a8a",
         paddingHorizontal: 10,
         borderRadius: 10,
-        backgroundColor: '#D9D9D9'
+        backgroundColor: 'white'
       }, scrollView: {
         height: '60%',
       },
@@ -171,7 +172,7 @@ const Therapist = () => {
         alignSelf: sender === 'User' ? 'flex-end' : 'flex-start',
         borderRadius: 20,
         padding: 20,
-        backgroundColor: sender === 'User' ? '#E6E6E6' : '#F0F0F0',
+        backgroundColor: sender === 'User' ? 'white' : '#F0F0F0',
         marginVertical: 4,
         maxWidth: '80%',
         overflow: 'hidden',

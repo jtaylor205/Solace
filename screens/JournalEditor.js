@@ -174,7 +174,7 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
     },
     saveButton: {
       marginLeft: "5%",
-      backgroundColor: "#39485e",
+      backgroundColor: "#A4B0E4",
       paddingHorizontal: 10,
       paddingVertical: 4,
       borderRadius: 5,

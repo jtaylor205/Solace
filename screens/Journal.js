@@ -29,7 +29,7 @@ export default function Journal({ navigation, route }) {
     if (hours < 12) {
       setGradient(['#2E97D1', '#FEC49F','#F56810']);
     } else if (hours < 18) {
-      setGradient(['#66CCFF', '#FFCC99']);
+      setGradient(['#70B3C2', '#FFEBE1', '#A0AEE7']);
     } else {
       setGradient(['#9D89C4', '#FFAC6B']);
     }
@@ -97,27 +97,36 @@ export default function Journal({ navigation, route }) {
 
   return (
     <>
+    <Canvas style={{ flex: 1 }}>
+      <Rect x={0} y={0} width={width} height={height}>
+        <LinearGradient 
+          start={vec(0,0)}
+          end={vec(width, height)}
+          colors={gradientColors}
+          />
+      </Rect>
+    </Canvas>
     <View style={styles.container}>
-    <ScrollView style={styles.listContainer}>
-    <FlatList
-        // Sort the entries by last modified date
-        data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
-        keyExtractor={(item) => item.id}
-        // What to render for each entry
-        renderItem={({ item }) => (
-          <JournalItem item={item} navigation={navigation} />
-        )}
-        contentContainerStyle={styles.listContentContainer}
-        style={styles.listContainer}
-        ListEmptyComponent={emptyList}
-      />
-    </ScrollView>
-
+      <Text style={styles.greeting}>Journal</Text>
+      <ScrollView style={styles.listContainer}>
+      <FlatList
+          // Sort the entries by last modified date
+          data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
+          keyExtractor={(item) => item.id}
+          // What to render for each entry
+          renderItem={({ item }) => (
+            <JournalItem item={item} navigation={navigation} />
+          )}
+          contentContainerStyle={styles.listContentContainer}
+          style={styles.listContainer}
+          ListEmptyComponent={emptyList}
+        />
+      </ScrollView>
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate("JournalEditor")}
       >
-        <Ionicons name="pencil" size={25} color="white" />
+        <Ionicons name="pencil" size={25} color="#A4B0E4" />
       </TouchableOpacity>
     </View>
     </>
@@ -127,9 +136,18 @@ export default function Journal({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    position: 'absolute',
+    backgroundColor: "transparent",
+    paddingTop: 75,
+    paddingHorizontal: 25,
+    width: "100%",
+    height: "100%",
+  },
+  greeting: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   listContainer: {
     width: "100%",
@@ -147,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     right: 20,
     bottom: 20,
-    backgroundColor: "#39485e",
+    backgroundColor: "white",
     borderRadius: 30,
     elevation: 8,
   },

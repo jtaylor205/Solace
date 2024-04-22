@@ -37,14 +37,15 @@ const styles = StyleSheet.create({
   entryItem: {
     height: 115,
     alignItems: "left",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "#c7c7c7",
-    paddingVertical: "5%",
+    backgroundColor: 'white',
+    padding: "6%",
     flexDirection: "column",
     justifyContent: "space-between",
+    marginBottom: '3%',
+    borderRadius: 15,
   },
   JournalTitle: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: "600",
   },
   journalContent: {
