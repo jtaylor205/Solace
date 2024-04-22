@@ -85,18 +85,10 @@ const Profile = ({ navigation }) => {
     <View style={styles.container}>
      <View style={styles.topContainer}>
         <TouchableOpacity onPress={() => navigation.navigate("Main")}>
-            <Ionicons 
-              size = "35%"
-              marginBottom = "10"
-              color = "black"
-              name="chevron-back-outline"></Ionicons>
+            <Ionicons style={styles.backBtn} name="chevron-back-outline"></Ionicons>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => logout()}>
-            <Ionicons 
-              size = "35%"
-              marginBottom = "10"
-              color = "black"
-              name="log-out-outline"></Ionicons>
+            <Ionicons style={styles.backBtn} name="log-out-outline"></Ionicons>
         </TouchableOpacity>
      </View>
     <View>
@@ -191,7 +183,12 @@ const Profile = ({ navigation }) => {
         color: 'white',     // Color of the text
         fontSize: 24,       // Size of the text
         fontWeight: 'bold'  // Bold text
-    }
+    },
+    backBtn: {
+      fontSize: 40,
+      marginBottom: 10,
+      color: "black",
+    },
   });
   
   export default Profile;
