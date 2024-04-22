@@ -3,7 +3,6 @@ import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { firebase } from '../utils/firebaseConfig';
 import { useRoute } from "@react-navigation/native";
-import {useAuth} from "../utils/firebase";
 const Profile = ({ navigation }) => {
   const route = useRoute()
   const firstName= route.params?.first
