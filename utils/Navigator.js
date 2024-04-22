@@ -6,6 +6,8 @@ import Tabs from '../utils/Tabs';
 import Login from '../screens/Login';
 import Signup from '../screens/Signup';
 import Profile from '../screens/Profile'
+import Journal from '../screens/Journal';
+import JournalEditor from '../screens/JournalEditor';
 
 const Stack = createStackNavigator();
 
