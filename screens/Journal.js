@@ -18,11 +18,8 @@ export default function Journal({ navigation, route }) {
 
   const { width, height } = useWindowDimensions();
   const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
-  const currentDate = new Date().toLocaleDateString();
-  const date = new Date();
-  let day = date.getDate();
-  let month = date.getMonth();
-  let year = date.getFullYear();
+
+
 
   // Used to create gradient background based on time of day
   useEffect(() => {

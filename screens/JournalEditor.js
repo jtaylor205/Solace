@@ -31,8 +31,14 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
     // Ref to control the scroll view (scroll to bottom, top, etc...)
     const scrollRef = useRef();
   
-    // Function to be called when the user presses the "Done" button
     const handleSave = () => {
+        // If the user did not enter a title or content, do not save the note
+        if (title == '' && content == '') {
+            navigation.navigate("Journal");
+            return;
+        }
+
+        // If the user did not enter a title or content, do not save the note
         const newEntry = {
             id: entry?.id || uuid.v4(),
             title,
