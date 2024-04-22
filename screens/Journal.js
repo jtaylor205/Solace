@@ -119,8 +119,8 @@ export default function Journal({ navigation, route }) {
     </Canvas>
     <View style={styles.container}>
       <Text style={styles.greeting}>Journal</Text>
-      <ScrollView style={styles.listContainer}>
         <FlatList
+            style={styles.listContainer}
             // Sort the entries by last modified date
             data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
             keyExtractor={(item) => item.id}
@@ -128,10 +128,8 @@ export default function Journal({ navigation, route }) {
               <JournalItem item={item} navigation={navigation} />
             )}
             contentContainerStyle={styles.listContentContainer}
-            style={styles.listContainer}
             ListEmptyComponent={emptyList}
           />
-      </ScrollView>
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate("JournalEditor")}
@@ -166,6 +164,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "85%",
     alignSelf: "center",
+    minHeight: '300%',
   },
   addButton: {
     position: "absolute",

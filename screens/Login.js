@@ -82,7 +82,7 @@ const Login = ({navigation}) => {
         fontWeight: 'bold',
         marginBottom: 10,
         textAlign: 'center',
-        letterSpacing: '3',
+        letterSpacing: 3,
       },
       image: {
         width: undefined,
