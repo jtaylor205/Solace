@@ -61,15 +61,12 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
   
     // Function to be called when the user presses the "trashcan" icon
     const handleDeletion = () => {
+        if (existingEntry) {
+            navigation.navigate("Journal", { deletedEntryId: existingEntry.id });
+            return;
+        }
       // Step 3 - part 6
-      if (entry?.id) {
-        const updatedEntries = prevEntries.filter((entryItem) => entryItem.id !== entry.id);
-        navigation.navigate("Journal", { deletedEntryId: entry.id });
-        return updatedEntries;
-      }
-      else{
-        navigation.navigate("Journal");
-      }
+      navigation.navigate("Journal", entry?.id && { deletedEntryId: entry.id });
     };
   
     // node --version # Should be >= 18npm 
@@ -96,7 +93,7 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
         const generatedPrompt = result.response.text();
         setTitle(generatedPrompt);
       } catch (error) {
-        console.log("Error: Unable to generate prompt");
+        setTitle("Error: Unable to generate prompt");
       }
     
   };
