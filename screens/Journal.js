@@ -1,13 +1,5 @@
 import {useEffect, useState} from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import { FlatList, StyleSheet, ScrollView, Text, useWindowDimensions, View, TouchableOpacity } from 'react-native';
 import { Ionicons} from '@expo/vector-icons';
 import { loadFromStorage , saveToStorage} from '../utils/storage';
 import JournalItem from '../components/JournalItem';
@@ -15,11 +7,8 @@ import uuid from 'react-native-uuid';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia'
 
 export default function Journal({ navigation, route }) {
-
   const { width, height } = useWindowDimensions();
   const [gradientColors, setGradient] = useState(['#2E97D1', '#FEC49F','#F56810'])
-
-
 
   // Used to create gradient background based on time of day
   useEffect(() => {
@@ -86,14 +75,11 @@ export default function Journal({ navigation, route }) {
     }
   }, [route.params?.newEntry]);
 
-
-  // Step 3 - part 8
   const emptyList = () => (
     <View style={styles.emptyContainer}>
-      <Text>Press the "pencil" button to get started</Text>
+      <Text style={{ color: 'white', fontWeight: 500, fontSize: 15 }}>Press the "Pencil" Icon to get started</Text>
     </View>
   );
-
 
   return (
     <>
@@ -113,7 +99,6 @@ export default function Journal({ navigation, route }) {
           // Sort the entries by last modified date
           data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
           keyExtractor={(item) => item.id}
-          // What to render for each entry
           renderItem={({ item }) => (
             <JournalItem item={item} navigation={navigation} />
           )}
