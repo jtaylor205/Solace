@@ -57,15 +57,15 @@ export default function Journal({ navigation, route }) {
     }, [entries]);
 
     // Hook to handle the deletion of an entry (received via params from the JournalEditor screen)
-    useEffect(() => {
-      const deletedEntryId = route.params?.deletedJournalId;
-      if (deletedEntryId) {
-        setEntries((prevEntries) =>
-          prevEntries?.filter((entry) => entry.id !== deletedEntryId) // Fixed variable name from deletedJournalId to deletedEntryId
-        );
-      }
-    }, [route.params?.deletedJournalId]);
-
+      useEffect(() => {
+        const deletedEntryId = route.params?.deletedJournalId;
+        if (deletedEntryId) {
+          setEntries((prevEntries) =>
+            prevEntries?.filter((entry) => entry.id !== deletedEntryId)
+          );
+        }
+      }, [route.params?.deletedJournalId]);
+    
 
     
    // Hook to handle the creation or update of an entry (received via params from the NoteEditor screen)
@@ -117,7 +117,6 @@ export default function Journal({ navigation, route }) {
       />
     </ScrollView>
 
-      {/* Button to create a new note -> navigates to JournalEditor screen */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate("JournalEditor")}
@@ -163,7 +162,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
 
 
 
