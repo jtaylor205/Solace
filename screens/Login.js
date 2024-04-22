@@ -36,8 +36,9 @@ const Login = ({navigation}) => {
                 <View style={styles.imageContainer}>
                   <Image source={require('../assets/logo.png')} style={styles.image} resizeMode="contain" />
                 </View>
-                  <Text style={styles.greeting}> Welcome to Solace </Text> 
+                  <Text style={styles.greeting}> SOLACE </Text> 
               <TextInput
+                autoCapitalize='none'
                 style={styles.input}
                 onChangeText={onChangeUsername}
                 value={username}
@@ -77,10 +78,11 @@ const Login = ({navigation}) => {
       },
       greeting: {
         color: 'white',
-        fontSize: 24,
+        fontSize: 40,
         fontWeight: 'bold',
         marginBottom: 10,
         textAlign: 'center',
+        letterSpacing: '3',
       },
       image: {
         width: undefined,
@@ -97,10 +99,11 @@ const Login = ({navigation}) => {
         height: 40,
         width: '85%',
         margin: 12,
-        borderWidth: 1,
+        borderWidth: 2,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: '#D9D9D9'
+        backgroundColor: 'whitesmoke',
+        borderColor: 'grey',
       },
       buttonContainer: {
         flexDirection: 'row',

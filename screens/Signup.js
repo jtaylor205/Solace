@@ -53,7 +53,7 @@ const Signup = ({ navigation }) => {
     <View style={styles.imageContainer}>
       <Image source={require('../assets/logo.png')} style={styles.image} resizeMode="contain" />
     </View>
-    <Text style={styles.greeting}>Create Solace Account</Text>
+    <Text style={styles.greeting}>Create Account</Text>
     <View style={styles.nameInput}>
       <TextInput
         autoCapitalize='none'
@@ -91,7 +91,7 @@ const Signup = ({ navigation }) => {
         style={{ width: '90%' }}
       />
       <TouchableOpacity onPress={toggleShowPassword}>
-        <Text>{showPassword ? <Ionicons name="eye-off" size={20}/> : <Ionicons name="eye" size={20}/>}</Text>
+        <Text>{showPassword ? <Ionicons name="eye-off" size={20} color='grey'/> : <Ionicons name="eye" size={20} color='grey'/>}</Text>
       </TouchableOpacity>
     </View>
     <View style={styles.buttonContainer}>
@@ -125,11 +125,12 @@ const Signup = ({ navigation }) => {
         justifyContent: 'space-between',
         height: 40,
         margin: 12,
-        borderWidth: 1,
         borderRadius: 10,
-        backgroundColor: '#D9D9D9',
         paddingHorizontal: 10,
-        width: '85%'
+        width: '85%',
+        borderWidth: 2,
+        backgroundColor: 'whitesmoke',
+        borderColor: 'grey',
       },
       nameInput: {
         flexDirection: 'row',
@@ -140,10 +141,12 @@ const Signup = ({ navigation }) => {
         height: 40,
         width: '47.5%',
         margin: 12,
-        borderWidth: 1,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: '#D9D9D9'
+        backgroundColor: '#D9D9D9',
+        borderWidth: 2,
+        backgroundColor: 'whitesmoke',
+        borderColor: 'grey',
       },
       greeting: {
         color: 'white',
@@ -167,10 +170,11 @@ const Signup = ({ navigation }) => {
         height: 40,
         width: '85%',
         margin: 12,
-        borderWidth: 1,
         padding: 10,
         borderRadius: 10,
-        backgroundColor: '#D9D9D9'
+        borderWidth: 2,
+        backgroundColor: 'whitesmoke',
+        borderColor: 'grey',
       },
       buttonContainer: {
         height: ((Dimensions.get('window').height) * 0.06) < 40 ? '6%' : 40,
