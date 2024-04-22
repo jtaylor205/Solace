@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, TouchableOpacity, TextInput, SectionList } from 'react-native';
 import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
 import { firebase } from '../utils/firebaseConfig';
+import { useFocusEffect } from "@react-navigation/native"
 import uuid from 'react-native-uuid'
 import Task from '../components/Task';
 import TaskModal from '../components/TaskModal';
 import { loadFromStorage, saveToStorage } from "../utils/storage";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-const Home = () => {
+const Home = ({ navigation }) => {
   //For Gradient size
   const { width, height } = useWindowDimensions();
   //For greeting specific user
@@ -40,6 +42,33 @@ const Home = () => {
       saveToStorage(tasks, "tasks");
     }
   }, [tasks]);
+
+  const fetchUserData = async () => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      try {
+        const userDoc = await firebase.firestore().collection('users').doc(uid).get();
+        if (userDoc.exists) {
+          setUserDetails(userDoc.data());
+        } else {
+          console.log("No user data found!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+        fetchUserData();
+
+        return () => {
+            // Optional cleanup actions
+        };
+    }, [])
+);
 
   // Callback function to handle the creation of a new todo (called from the TaskModal component)
   const handleAddTask = (input) => {
@@ -126,7 +155,16 @@ const Home = () => {
         </Rect>
       </Canvas>
       <View style={styles.container}>
-        <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
+      <View style={styles.topContainer}>
+          <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile", {first: userDetails.firstName,last: userDetails.lastName, email: userDetails.email})}>
+            <Ionicons 
+                size = "25"
+                marginBottom = "10"
+                color = "white"
+                name="person-circle-outline"></Ionicons>
+          </TouchableOpacity>
+        </View>
         <View style={styles.checklist}>
           <Text style={styles.subheading}>Daily Checklist</Text>
           <View style={styles.checklistWrapper}>
@@ -248,7 +286,11 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'white',
     marginVertical: 10,
-  },
+  },topContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  }
 });
 
 export default Home;
