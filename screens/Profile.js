@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef} from 'react';
 import { View, Text, Image, StyleSheet, TextInput, useWindowDimensions, Button, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { firebase } from '../utils/firebaseConfig';
-import { useRoute } from "@react-navigation/native"
+import { useRoute } from "@react-navigation/native";
+import {useAuth} from "../utils/firebase";
 const Profile = ({ navigation }) => {
   const route = useRoute()
   const firstName= route.params?.first
@@ -11,6 +12,22 @@ const Profile = ({ navigation }) => {
   const { width, height } = useWindowDimensions();
   const [userName, setUserName] = useState(`${firstName} ${lastName}`);
   const [userEmail, setEmail] = useState(email);
+
+  const logout = () => {
+    firebase.auth().signOut().then(() => {
+        // Successfully signed out
+        navigation.navigate({
+            name: 'Login',
+            params: {}, 
+            merge: true,
+            animationEnabled: false 
+        });
+    }).catch((error) => {
+        // An error happened.
+        console.error(error);
+    });
+};
+
   
   const updateProfile = async () => {
     const user = firebase.auth().currentUser;
@@ -74,6 +91,13 @@ const Profile = ({ navigation }) => {
               marginBottom = "10"
               color = "black"
               name="chevron-back-outline"></Ionicons>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => logout()}>
+            <Ionicons 
+              size = "35%"
+              marginBottom = "10"
+              color = "black"
+              name="log-out-outline"></Ionicons>
         </TouchableOpacity>
      </View>
     <View>
