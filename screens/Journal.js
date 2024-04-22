@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
 import { FlatList, StyleSheet, ScrollView, Text, useWindowDimensions, View, TouchableOpacity } from 'react-native';
 import { Ionicons} from '@expo/vector-icons';
-import { loadFromStorage , saveToStorage} from '../utils/storage';
 import JournalItem from '../components/JournalItem';
-import uuid from 'react-native-uuid';
-import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia'
+import { Canvas, LinearGradient, Rect, vec } from '@shopify/react-native-skia';
+import { firebase } from '../utils/firebaseConfig';
+import {saveEntryToFirestore} from '../utils/firestore'
 
 export default function Journal({ navigation, route }) {
   const { width, height } = useWindowDimensions();
@@ -28,29 +28,52 @@ export default function Journal({ navigation, route }) {
   // State to keep track of the user's journal entries
   const [entries, setEntries] = useState(null);
 
-  // Hook to load the notes from the device's storage when the screen is mounted
+  // Load entries from Firestore when the screen is mounted
   useEffect(() => {
-    loadFromStorage("entries").then((loadedEntries) => {
-    setEntries(loadedEntries);
-  });
-    }, []);
-  
-  // Hook to save the entries to the device's storage whenever the entry changes (create, update, delete)
-    useEffect(() => {
-      if (entries) {
-        saveToStorage(entries, "entries");
-      }
-    }, [entries]);
+    const userId = firebase.auth().currentUser?.uid;
+    if (userId) {
+        const entriesRef = firebase.firestore().collection('users').doc(userId).collection('entries');
+        entriesRef.onSnapshot((snapshot) => {
+            const loadedEntries = [];
+            snapshot.forEach((doc) => {
+                loadedEntries.push(doc.data());
+            });
+            setEntries(loadedEntries);
+        });
+    }
+  }, []);
 
-    // Hook to handle the deletion of an entry (received via params from the JournalEditor screen)
-      useEffect(() => {
-        const deletedEntryId = route.params?.deletedEntryId;
-        if (deletedEntryId) {
-          setEntries((prevEntries) =>
-            prevEntries?.filter((entry) => entry.id !== deletedEntryId)
-          );
-        }
-      }, [route.params?.deletedEntryId]);
+  // Save entries to Firestore whenever they change
+  useEffect(() => {
+      const userId = firebase.auth().currentUser?.uid;
+      if (userId && entries) {
+          saveEntryToFirestore(userId, entries);
+      }
+  }, [entries]);
+
+  // Hook to handle the deletion of an entry (received via params from the JournalEditor screen)
+  useEffect(() => {
+    const deletedEntryId = route.params?.deletedEntryId;
+    if (deletedEntryId) {
+      // Remove the entry from Firestore
+      const userId = firebase.auth().currentUser?.uid;
+      if (userId) {
+        const entryRef = firebase.firestore().collection('users').doc(userId).collection('entries').doc(deletedEntryId);
+        entryRef.delete()
+          .then(() => {
+            console.log("Entry successfully deleted from Firestore");
+          })
+          .catch((error) => {
+            console.error("Error deleting entry from Firestore:", error);
+          });
+      }
+
+      // Update the local state to remove the deleted entry
+      setEntries((prevEntries) =>
+        prevEntries?.filter((entry) => entry.id !== deletedEntryId)
+      );
+    }
+  }, [route.params?.deletedEntryId]);
     
 
     
@@ -63,12 +86,14 @@ export default function Journal({ navigation, route }) {
           // If prevEntries is null, initialize it as an empty array
           prevEntries = [];
         }
-        const entryExists = prevEntries.some((entry) => entry.id === newEntry.id);
-        if (entryExists) {
-          return prevEntries.map((entry) =>
-            entry.id === newEntry.id ? newEntry : entry
-          );
+        const existingEntryIndex = prevEntries.findIndex((entry) => entry.id === newEntry.id);
+        if (existingEntryIndex !== -1) {
+          // If the entry already exists, update it
+          const updatedEntries = [...prevEntries];
+          updatedEntries[existingEntryIndex] = newEntry;
+          return updatedEntries;
         } else {
+          // If the entry is new, add it to the array
           return [...prevEntries, newEntry];
         }
       });
@@ -95,17 +120,17 @@ export default function Journal({ navigation, route }) {
     <View style={styles.container}>
       <Text style={styles.greeting}>Journal</Text>
       <ScrollView style={styles.listContainer}>
-      <FlatList
-          // Sort the entries by last modified date
-          data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <JournalItem item={item} navigation={navigation} />
-          )}
-          contentContainerStyle={styles.listContentContainer}
-          style={styles.listContainer}
-          ListEmptyComponent={emptyList}
-        />
+        <FlatList
+            // Sort the entries by last modified date
+            data={entries?.sort((a, b) => b.lastModified - a.lastModified)}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <JournalItem item={item} navigation={navigation} />
+            )}
+            contentContainerStyle={styles.listContentContainer}
+            style={styles.listContainer}
+            ListEmptyComponent={emptyList}
+          />
       </ScrollView>
       <TouchableOpacity
         style={styles.addButton}

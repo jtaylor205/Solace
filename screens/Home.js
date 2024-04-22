@@ -6,8 +6,8 @@ import { useFocusEffect } from "@react-navigation/native"
 import uuid from 'react-native-uuid'
 import Task from '../components/Task';
 import TaskModal from '../components/TaskModal';
-import { loadFromStorage, saveToStorage } from "../utils/storage";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { saveTasksToFirestore } from '../utils/firestore';
 
 const Home = ({ navigation }) => {
   //For Gradient size
@@ -29,17 +29,26 @@ const Home = ({ navigation }) => {
     { title: "Completed", data: tasks?.filter((task) => task.completed) },
   ].filter((section) => section.data?.length > 0);
 
-  // Hook to load the todos from the device's storage when the screen is mounted
+  // Hook to load the todos from Firestore when the screen is mounted
   useEffect(() => {
-    loadFromStorage("tasks").then((loadedTasks) => {
-      setTasks(loadedTasks);
-    });
+    const userId = firebase.auth().currentUser?.uid;
+    if (userId) {
+      const tasksRef = firebase.firestore().collection('users').doc(userId).collection('tasks');
+      tasksRef.onSnapshot((snapshot) => {
+        const loadedTasks = [];
+        snapshot.forEach((doc) => {
+          loadedTasks.push(doc.data());
+        });
+        setTasks(loadedTasks);
+      });
+    }
   }, []);
 
-  // Hook to save the todos to the device's storage whenever the todos changes (completed, create, delete)
+  // Hook to save the todos to Firestore whenever the todos changes (completed, create, delete)
   useEffect(() => {
-    if (tasks) {
-      saveToStorage(tasks, "tasks");
+    const userId = firebase.auth().currentUser?.uid;
+    if (userId && tasks) {
+      saveTasksToFirestore(userId, tasks);
     }
   }, [tasks]);
 
@@ -94,6 +103,19 @@ const Home = ({ navigation }) => {
     setTasks((prevTasks) => {
       return prevTasks?.filter((task) => task.id !== id);
     });
+  
+    // Remove the task from Firestore
+    const userId = firebase.auth().currentUser?.uid;
+    if (userId) {
+      const taskRef = firebase.firestore().collection('users').doc(userId).collection('tasks').doc(id);
+      taskRef.delete()
+        .then(() => {
+          console.log("Task successfully deleted from Firestore");
+        })
+        .catch((error) => {
+          console.error("Error deleting task from Firestore:", error);
+        });
+    }
   };
 
   // Function to render an empty list message (if no todos)
@@ -158,11 +180,7 @@ const Home = ({ navigation }) => {
       <View style={styles.topContainer}>
           <Text style={styles.greeting}>{greeting}, {userDetails.firstName}!</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Profile", {first: userDetails.firstName,last: userDetails.lastName, email: userDetails.email})}>
-            <Ionicons 
-                size = "25"
-                marginBottom = "10"
-                color = "white"
-                name="person-circle-outline"></Ionicons>
+            <Ionicons style={styles.profileIcon} name="person-circle-outline"></Ionicons>
           </TouchableOpacity>
         </View>
         <View style={styles.checklist}>
@@ -286,10 +304,16 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'white',
     marginVertical: 10,
-  },topContainer: {
+  },
+  topContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  profileIcon: {
+    fontSize: 30,
+    color: "white"
   }
 });
 
