@@ -19,7 +19,7 @@ export default JournalItem = ({ item, navigation }) => {
       onPress={() => navigation.navigate("JournalEditor", { entry: item })}
     >
       {/* Display the title, content, and date of the entry */}
-      <Text style={styles.journalTitle} numberOfLines={1} ellipsizeMode="tail">
+      <Text style={styles.JournalTitle} numberOfLines={1} ellipsizeMode="tail">
         {item.title}
       </Text>
       <Text style={styles.journalContent} numberOfLines={1} ellipsizeMode="tail">

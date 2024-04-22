@@ -4,6 +4,8 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
   import { Ionicons,Entypo } from "@expo/vector-icons";
   //import * as Clipboard from "expo-clipboard";
   import uuid from "react-native-uuid";
+  const { GoogleGenerativeAI } = require("@google/generative-ai");
+
   
   export default function JournalEditor({ navigation, route }) {
     const entry = route.params?.Journal;
@@ -12,6 +14,8 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
     const [title, setTitle] = useState(entry?.title || "");
     const [content, setContent] = useState(entry?.content || "");
     const [existingEntry, setExistingEntry] = useState(null);
+    //const [prompt, setPrompt] = useState('');
+
 
 
     useEffect(() => {
@@ -35,25 +39,50 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
             content,
             lastModified: Date.now(),
         };
-        if (existingEntry) {
-            // Delete the previous version of the entry
-            navigation.navigate("Journal", { deletedJournalId: existingEntry.id });
-        }
+
         navigation.navigate("Journal", { newEntry });
     };
   
     // Function to be called when the user presses the "trashcan" icon
     const handleDeletion = () => {
       // Step 3 - part 6
-      navigation.navigate("Journal", entry?.id && { deletedJournalId: entry.id });
-
+      if (entry?.id) {
+        const updatedEntries = prevEntries.filter((entryItem) => entryItem.id !== entry.id);
+        navigation.navigate("Journal", { deletedEntryId: entry.id });
+        return updatedEntries;
+      }
+      else{
+        navigation.navigate("Journal");
+      }
     };
   
+    // node --version # Should be >= 18npm 
+// npm install @google/generative-ai
+
+    const {
+        GoogleGenerativeAI,
+        HarmCategory,
+        HarmBlockThreshold,
+    } = require("@google/generative-ai");
+
+
     // Function to copy the note's content to the clipboard (uses Expo SDK's Clipboard module)
-    const copyToClipboard = async () => {
-      // Step 3 - part 7
-        const noteString = `${title}\n\n${content}`;
-        await Clipboard.setStringAsync(noteString);
+    const generatePrompt = async () => {
+        try {
+        const genAI = new GoogleGenerativeAI("AIzaSyB6WI7g4ENpYQVIs7c1EBFdW0XbemwYo8s");
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+        const generationConfig = { temperature: 0.9, topK: 1, topP: 1, maxOutputTokens: 2048 };
+    
+        const result = await model.generateContent("Generate a journaling prompt for mental health but in your response only include the prompt.");
+    
+        const response = await result.response;
+        const generatedPrompt = result.response.text();
+        setTitle(generatedPrompt);
+      } catch (error) {
+        console.log("Error: Unable to generate prompt");
+      }
+    
   };
 
   
@@ -75,7 +104,7 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
               <Ionicons name="trash-outline" size={24} color="black" />
             </TouchableOpacity>
             {/* Copy button */}
-            <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+            <TouchableOpacity style={styles.copyButton} onPress={generatePrompt}>
               <Entypo name="book" size={24} color="black" />
               <Text style={styles.copyButtonText}>Generate prompt</Text>
             </TouchableOpacity>
@@ -95,6 +124,7 @@ import {View, TextInput, Platform, StyleSheet, TouchableOpacity, Text, ScrollVie
           value={title}
           onChangeText={setTitle}
           style={styles.titleInput}
+          multiline
         />
         {/* Text input fields for the note's content */}
         <TextInput
